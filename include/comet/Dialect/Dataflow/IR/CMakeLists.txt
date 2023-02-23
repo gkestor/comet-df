@@ -1,0 +1,15 @@
+set(LLVM_TARGET_DEFINITIONS DataflowOps.td)
+mlir_tablegen(DataflowOps.h.inc -gen-op-decls)
+mlir_tablegen(DataflowOps.cpp.inc -gen-op-defs)
+mlir_tablegen(DataflowDialect.h.inc -gen-dialect-decls -dialect=dataflow)
+mlir_tablegen(DataflowDialect.cpp.inc -gen-dialect-defs -dialect=dataflow)
+add_public_tablegen_target(COMETDataflowOpsIncGen)
+add_dependencies(mlir-headers COMETDataflowOpsIncGen)
+
+set(LLVM_TARGET_DEFINITIONS DataflowTypes.td)
+mlir_tablegen(DataflowTypes.h.inc -gen-typedef-decls)
+mlir_tablegen(DataflowTypes.cpp.inc -gen-typedef-defs)
+add_public_tablegen_target(COMETDataflowTypesIncGen)
+
+add_mlir_doc(DataflowDialect DataflowDialect Dataflow/ -gen-dialect-doc)
+add_mlir_doc(DataflowOps DataflowOps Dataflow/ -gen-op-doc)

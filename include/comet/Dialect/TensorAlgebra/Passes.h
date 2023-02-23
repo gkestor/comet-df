@@ -63,9 +63,9 @@ namespace mlir
         /// Create a pass for lowering TA operations to TTGT
         /// This pass selects either the best permutation among all
         /// or pass can specify the iteration order of the permutation, ith permutation
-        std::unique_ptr<Pass> createLoweringTTGTPass(bool enableBestPerm,
-                                                     int whatPermID = 1,
-                                                     bool printFlops = false);
+        // std::unique_ptr<Pass> createLoweringTTGTPass(bool enableBestPerm,
+        //                                              int whatPermID = 1,
+        //                                              bool printFlops = false);
 
         /// Create a pass to lower dense input/output tensor declarations
         std::unique_ptr<Pass> createDenseTensorDeclLoweringPass();

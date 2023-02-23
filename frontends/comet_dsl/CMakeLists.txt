@@ -21,7 +21,7 @@ set(LIBS
   MLIRAffineToStandard
   MLIRLinalgToLLVM
   MLIRSCFToStandard
-  MLIREDSC
+  #MLIREDSC
   MLIRLinalgAnalysis  
   MLIRLinalg
   MLIRLinalgTransforms
@@ -39,6 +39,7 @@ set(LIBS
   COMETUtils
   COMETTensorAlgebra
   COMETIndexTree
+  COMETDataflow
 )
 
 target_link_libraries(comet-opt 

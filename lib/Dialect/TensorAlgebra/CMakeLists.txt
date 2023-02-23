@@ -9,7 +9,7 @@ add_llvm_library(COMETTensorAlgebra
 
   Transforms/Transforms.cpp
   Transforms/LinalgTransforms.cpp
-  Transforms/TCtoTTGT.cpp
+  #Transforms/TCtoTTGT.cpp
   Transforms/Passes.cpp
 
   ADDITIONAL_HEADER_DIRS

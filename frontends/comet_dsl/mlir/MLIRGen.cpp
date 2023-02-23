@@ -1337,11 +1337,11 @@ namespace
       // We have the initializer value, but in case the variable was declared
       // with specific shape, we emit a "reshape" operation. It will get
       // optimized out later as needed.
-      if (!vardecl.getType().shape.empty())
-      {
-        value = builder.create<ReshapeOp>(loc(vardecl.loc()),
-                                          getType(vardecl.getType()), value);
-      }
+      // if (!vardecl.getType().shape.empty())
+      // {
+      //   value = builder.create<ReshapeOp>(loc(vardecl.loc()),
+      //                                     getType(vardecl.getType()), value);
+      // }
 
       // Register the value in the symbol table.
       if (failed(declare(vardecl.getName(), value)))

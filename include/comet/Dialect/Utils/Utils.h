@@ -26,10 +26,11 @@
 
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Dialect/SCF/SCF.h"
-#include "mlir/Dialect/Linalg/EDSC/Builders.h"
+#include "mlir/Dialect/Linalg/IR/LinalgOps.h"
+//#include "mlir/Dialect/Linalg/EDSC/Builders.h"
 
-#include "mlir/Dialect/MemRef/EDSC/Intrinsics.h"
-#include "mlir/Dialect/StandardOps/EDSC/Intrinsics.h"
+//#include "mlir/Dialect/MemRef/EDSC/Intrinsics.h"
+//#include "mlir/Dialect/StandardOps/EDSC/Intrinsics.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 
 #include "mlir/Transforms/LoopUtils.h"

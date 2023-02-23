@@ -28,9 +28,9 @@
 #include "comet/Dialect/TensorAlgebra/IR/TADialect.h"
 #include "comet/Dialect/TensorAlgebra/Passes.h"
 #include "comet/Dialect/IndexTree/IR/ITDialect.h"
+#include "comet/Dialect/Dataflow/IR/DataflowDialect.h"
 #include "comet/Dialect/IndexTree/Passes.h"
-#include "mlir/Dialect/StandardOps/EDSC/Intrinsics.h"
-#include "mlir/Dialect/Linalg/EDSC/Intrinsics.h"
+#include "comet/Dialect/Dataflow/Passes.h"
 #include "mlir/Dialect/Linalg/IR/LinalgOps.h"
 #include "mlir/Dialect/Linalg/Passes.h"
 
@@ -142,7 +142,6 @@ static cl::opt<bool> OptDenseTransposeOp("opt-dense-transpose",
 static cl::opt<bool> OptWorkspace("opt-comp-workspace", cl::init(false),
                                   cl::desc("Optimize sparse output code generation while reducing iteration space for nonzero elements"));
 
-
 // The details of the fusion algorithm can be found in the following paper.
 // ReACT: Redundancy-Aware Code Generation for Tensor Expressions.
 // Tong Zhou, Ruiqin Tian, Rizwan A Ashraf, Roberto Gioiosa, Gokcen Kestor, Vivek Sarkar.
@@ -151,7 +150,7 @@ static cl::opt<bool> OptWorkspace("opt-comp-workspace", cl::init(false),
 //  Partial Fusion (ReACT Fusion) on Index Tree dialect
 //  =============================================================================
 static cl::opt<bool> OptKernelFusion("opt-fusion", cl::init(false),
-                                        cl::desc("Output IT dialect after redundancy-aware fusion"));
+                                     cl::desc("Output IT dialect after redundancy-aware fusion"));
 
 // =============================================================================
 // TTGT reformulation for tensor contraction operations
@@ -159,21 +158,23 @@ static cl::opt<bool> OptKernelFusion("opt-fusion", cl::init(false),
 static cl::opt<bool> IsLoweringTCtoTTGT("convert-tc-to-ttgt",
                                         cl::desc("Output IR after lowering dense tensor contractions operations through a TTGT approach"));
 
-
 // =============================================================================
 // Lowering TA operations to IT dialect
 // =============================================================================
 static cl::opt<bool> IsLoweringtoIndexTree("convert-ta-to-it", // Lower sparse/dense mult (semiring) and elemwise (monoid) ops to index-tree dialect
                                            cl::desc("Output IT dialect after processing dense sparse/dense mult and elemwise ops"));
 
+// =============================================================================
+// Lowering TA/LingAlg operations to Dataflo dialect
+// =============================================================================
+static cl::opt<bool> IsLoweringtoLinAlgToDataflow("convert-linalg-to-df",
+                                                  cl::desc("Output dataflow dialect"));
 
 // =============================================================================
 // Lowering IT operations to loops
 // =============================================================================
 static cl::opt<bool> IsLoweringtoSCF("convert-to-loops", // Lower sparse/dense mult (semiring) and elemwise (monoid) ops to index-tree dialect
                                      cl::desc("Output IR after processing all ops"));
-
-
 
 // =============================================================================
 // Utility functions
@@ -248,6 +249,20 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
 
   mlir::OpPassManager &optPM = pm.nest<mlir::FuncOp>();
 
+  // Temporarly
+  //  ===================================================================================
+  //  Lowering of linalg operations to Dataflow dialect
+  //  ===================================================================================
+  if (IsLoweringtoLinAlgToDataflow)
+  {
+    /// Generate the index tree IR
+    pm.addPass(mlir::comet::Dataflow::createConvertLinalgToDataflowPass());
+
+    if (mlir::failed(pm.run(*module)))
+      return 4;
+    return 0;
+  }
+
   //  =============================================================================
   //  High-level optimization at the TA dialect
   //  Such as finding the optimal ordering of dense tensor contractions, or reformulating tensor contractions
@@ -270,10 +285,10 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   optPM.addPass(mlir::tensorAlgebra::createTensorFillLoweringPass());
 
   /// TTGT reformulation for dense tensor contraction operations
-  if (IsLoweringTCtoTTGT)
-  {
-    optPM.addPass(mlir::tensorAlgebra::createLoweringTTGTPass(IsSelectBestPermTTGT, selectedPermNum, IsPrintFlops));
-  }
+  // if (IsLoweringTCtoTTGT)
+  // {
+  //   optPM.addPass(mlir::tensorAlgebra::createLoweringTTGTPass(IsSelectBestPermTTGT, selectedPermNum, IsPrintFlops));
+  // }
 
   // =============================================================================
   // Operation based optimizations
@@ -311,6 +326,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
       return 0;
     }
   }
+
   if (OptKernelFusion)
   {
     // Apply partial fusion on index tree dialect for some compound expressions.
@@ -331,8 +347,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     optPM.addPass(mlir::tensorAlgebra::createSparseInputTensorDeclLoweringPass());
     optPM.addPass(mlir::tensorAlgebra::createDenseTensorDeclLoweringPass());        // early lowering for dense input/output
     optPM.addPass(mlir::tensorAlgebra::createSparseOutputTensorDeclLoweringPass()); // early lowering for sparse output
-    //tensor.fill operation might be added after the partial fusion pass
-    optPM.addPass(mlir::tensorAlgebra::createTensorFillLoweringPass()); 
+    // tensor.fill operation might be added after the partial fusion pass
+    optPM.addPass(mlir::tensorAlgebra::createTensorFillLoweringPass());
     //=============================================================================
 
     // =============================================================================
@@ -392,6 +408,7 @@ int main(int argc, char **argv)
   // Register our Dialect with MLIR.
   context.loadDialect<mlir::tensorAlgebra::TADialect>();
   context.loadDialect<mlir::indexTree::ITDialect>();
+  context.loadDialect<mlir::comet::Dataflow::DataflowDialect>();
   context.loadDialect<mlir::StandardOpsDialect>();
   context.loadDialect<mlir::memref::MemRefDialect>();
   context.loadDialect<mlir::linalg::LinalgDialect>();

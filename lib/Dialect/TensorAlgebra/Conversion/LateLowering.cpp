@@ -30,9 +30,9 @@
 
 #include "mlir/Dialect/Linalg/IR/LinalgOps.h"
 #include "mlir/Dialect/Linalg/IR/LinalgTypes.h"
-#include "mlir/Dialect/Linalg/EDSC/Intrinsics.h"
+//#include "mlir/Dialect/Linalg/EDSC/Intrinsics.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
-#include "mlir/Dialect/StandardOps/EDSC/Intrinsics.h"
+//#include "mlir/Dialect/StandardOps/EDSC/Intrinsics.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/SCF/SCF.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
@@ -40,7 +40,7 @@
 #include "mlir/Transforms/DialectConversion.h"
 #include "llvm/ADT/Sequence.h"
 
-#include "mlir/EDSC/Builders.h"
+//#include "mlir/EDSC/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
@@ -49,8 +49,8 @@
 
 using namespace mlir;
 using namespace mlir::linalg;
-using namespace mlir::edsc;
-using namespace mlir::edsc::intrinsics;
+//using namespace mlir::edsc;
+//using namespace mlir::edsc::intrinsics;
 using namespace mlir::tensorAlgebra;
 
 // *********** For debug purpose *********//

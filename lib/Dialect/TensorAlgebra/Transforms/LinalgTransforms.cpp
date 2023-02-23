@@ -40,8 +40,8 @@
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 using namespace mlir;
-using namespace mlir::edsc;
-using namespace mlir::edsc::intrinsics;
+//using namespace mlir::edsc;
+//using namespace mlir::edsc::intrinsics;
 using namespace mlir::linalg;
 using namespace mlir::tensorAlgebra;
 
@@ -128,19 +128,10 @@ namespace
 /// generated CallOp. MemRefTypes have their layout canonicalized since the
 /// information is not used in signature generation.
 /// Note that static size information is not modified.
-static SmallVector<Type, 4> extractOperandTypes(Operation *op)
-{
+static SmallVector<Type, 4> extractOperandTypes(Operation *op) {
   SmallVector<Type, 4> result;
   result.reserve(op->getNumOperands());
-  if (auto indexedGenericOp = dyn_cast<IndexedGenericOp>(op))
-  {
-    auto *ctx = op->getContext();
-    auto numLoops = indexedGenericOp.getNumLoops();
-    result.reserve(op->getNumOperands() + numLoops);
-    result.assign(numLoops, IndexType::get(ctx));
-  }
-  for (auto type : op->getOperandTypes())
-  {
+  for (auto type : op->getOperandTypes()) {
     // The underlying descriptor type (e.g. LLVM) does not have layout
     // information. Canonicalizing the type at the level of std when going into
     // a library call avoids needing to introduce DialectCastOp.
@@ -281,7 +272,8 @@ struct OptDenseTranspose : public ConversionPattern
     auto inputMemref = op->getOperand(0);
     auto outputMemref = op->getOperand(1);
 
-    auto step = rewriter.create<ConstantIndexOp>(loc, 1);
+    //auto step = rewriter.create<ConstantIndexOp>(loc, 1);
+    int64_t step = 1;
     std::vector<AffineForOp> loops;
     std::vector<int64_t> indexIterateOrder;
     for (int64_t rank = 0; rank < inputType.cast<mlir::MemRefType>().getRank(); rank++)
